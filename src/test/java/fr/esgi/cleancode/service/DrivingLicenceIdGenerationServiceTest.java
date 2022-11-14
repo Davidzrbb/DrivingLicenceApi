@@ -1,5 +1,6 @@
 package fr.esgi.cleancode.service;
 
+import lombok.var;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
