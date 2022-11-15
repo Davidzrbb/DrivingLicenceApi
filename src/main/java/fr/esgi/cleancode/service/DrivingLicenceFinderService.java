@@ -11,9 +11,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DrivingLicenceFinderService {
 
-	private final InMemoryDatabase database;
+    private final InMemoryDatabase database;
 
-	public Optional<DrivingLicence> findById(UUID drivingLicenceId) {
-		return database.findById(drivingLicenceId);
-	}
+    public Optional<DrivingLicence> findById(UUID drivingLicenceId) {
+        return database.findById(drivingLicenceId);
+    }
 }

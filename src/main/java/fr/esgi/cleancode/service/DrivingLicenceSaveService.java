@@ -24,8 +24,7 @@ public class DrivingLicenceSaveService {
                     .id(drivingLicenceIdGenerationService.generateNewDrivingLicenceId())
                     .driverSocialSecurityNumber(validation.get())
                     .build();
-            database.save(drivingLicence.getId(), drivingLicence);
-            return Either.right(drivingLicence);
+            return Either.right(database.save(drivingLicence.getId(), drivingLicence));
         } else {
             return Either.left(validation.getError());
         }

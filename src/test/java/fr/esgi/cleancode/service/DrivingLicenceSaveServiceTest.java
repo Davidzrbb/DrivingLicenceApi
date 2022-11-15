@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -26,22 +27,25 @@ public class DrivingLicenceSaveServiceTest {
 
     @Mock
     private DrivingLicenceIdGenerationService serviceId;
+
     @Mock
     private InMemoryDatabase database;
-    @Captor
-    private ArgumentCaptor<DrivingLicence> entityCaptor;
+
 
     @Test
     void should_save() {
         UUID id = UUID.randomUUID();
 
         String validSocialSecurityNumber = "123456789123456";
+
         DrivingLicence drivingLicence = DrivingLicence.builder()
                 .id(id)
                 .driverSocialSecurityNumber(validSocialSecurityNumber)
                 .build();
 
         when(serviceId.generateNewDrivingLicenceId()).thenReturn(id);
+
+        when(database.save(any(), any(DrivingLicence.class))).thenReturn(drivingLicence);
 
         val actual = serviceSave.create(validSocialSecurityNumber);
 
