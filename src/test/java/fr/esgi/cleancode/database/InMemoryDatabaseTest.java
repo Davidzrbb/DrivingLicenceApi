@@ -1,7 +1,7 @@
 package fr.esgi.cleancode.database;
 
 import fr.esgi.cleancode.model.DrivingLicence;
-import lombok.var;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 

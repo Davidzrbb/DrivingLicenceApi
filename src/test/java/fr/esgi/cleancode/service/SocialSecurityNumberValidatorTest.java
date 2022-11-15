@@ -18,7 +18,7 @@ public class SocialSecurityNumberValidatorTest {
 	@ValueSource(strings = {"123456789012345", "098765432109876"})
 	void should_validate(String validSocialSecurityNumber) {
 		val actual = validate(validSocialSecurityNumber);
-		assertThat(actual).containsValidInstanceOf(DrivingLicence.class);
+		assertThat(actual).containsValidInstanceOf(String.class);
 	}
 
 	@ParameterizedTest

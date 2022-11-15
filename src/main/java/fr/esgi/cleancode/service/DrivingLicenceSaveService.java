@@ -1,11 +1,8 @@
 package fr.esgi.cleancode.service;
 
 import fr.esgi.cleancode.database.InMemoryDatabase;
-import fr.esgi.cleancode.exception.ApplicationError;
 import fr.esgi.cleancode.exception.InvalidDriverSocialSecurityNumberException;
 import fr.esgi.cleancode.model.DrivingLicence;
-import fr.esgi.cleancode.persistence.DrivingLicenceCreatorApi;
-import fr.esgi.cleancode.persistence.DrivingLicencePersistenceSpi;
 import fr.esgi.cleancode.service.validator.SocialSecurityNumberValidator;
 import io.vavr.control.Either;
 import io.vavr.control.Validation;
@@ -13,21 +10,25 @@ import lombok.RequiredArgsConstructor;
 
 
 @RequiredArgsConstructor
-public class DrivingLicenceSaveService implements DrivingLicenceCreatorApi {
+public class DrivingLicenceSaveService {
 
-	private final InMemoryDatabase database;
-	private final DrivingLicenceIdGenerationService drivingLicenceIdGenerationService;
-	private final DrivingLicencePersistenceSpi drivingLicencePersistenceSpi;
+    private final InMemoryDatabase database;
+    private final DrivingLicenceIdGenerationService drivingLicenceIdGenerationService;
 
-	public Either<InvalidDriverSocialSecurityNumberException, DrivingLicence> create(String socialSecurityNumber) {
+    public Either<InvalidDriverSocialSecurityNumberException, DrivingLicence> create(String socialSecurityNumber) {
 
-		Validation<InvalidDriverSocialSecurityNumberException, String> socialSecurityNumberValidator = SocialSecurityNumberValidator.validate(socialSecurityNumber);
-		DrivingLicence drivingLicence = DrivingLicence.builder()
-				.id(drivingLicenceIdGenerationService.generateNewDrivingLicenceId())
-				.driverSocialSecurityNumber(socialSecurityNumber)
-				.build();
+        Validation<InvalidDriverSocialSecurityNumberException, String> validation = SocialSecurityNumberValidator.validate(socialSecurityNumber);
 
-		return socialSecurityNumberValidator.toEither().mapLeft(socialSecurityNumberValidator)
+        if (validation.isValid()) {
+            DrivingLicence drivingLicence = DrivingLicence.builder()
+                    .id(drivingLicenceIdGenerationService.generateNewDrivingLicenceId())
+                    .driverSocialSecurityNumber(validation.get())
+                    .build();
+            database.save(drivingLicence.getId(), drivingLicence);
+            return Either.right(drivingLicence);
+        } else {
+            return Either.left(validation.getError());
+        }
 
-	}
+    }
 }
