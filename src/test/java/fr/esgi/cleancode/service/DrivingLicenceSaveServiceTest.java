@@ -10,9 +10,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -26,16 +28,19 @@ public class DrivingLicenceSaveServiceTest {
 
     @Mock
     private DrivingLicenceIdGenerationService serviceId;
+
     @Mock
     private InMemoryDatabase database;
-    @Captor
-    private ArgumentCaptor<DrivingLicence> entityCaptor;
 
+    @Captor private ArgumentCaptor<DrivingLicence> entityCaptor;
+
+    @Captor private ArgumentCaptor<UUID> uuidArgumentCaptor;
     @Test
     void should_save() {
         UUID id = UUID.randomUUID();
 
         String validSocialSecurityNumber = "123456789123456";
+
         DrivingLicence drivingLicence = DrivingLicence.builder()
                 .id(id)
                 .driverSocialSecurityNumber(validSocialSecurityNumber)
@@ -43,7 +48,12 @@ public class DrivingLicenceSaveServiceTest {
 
         when(serviceId.generateNewDrivingLicenceId()).thenReturn(id);
 
+        when(database.save(eq(id),any(DrivingLicence.class))).thenReturn(drivingLicence);
+
         val actual = serviceSave.create(validSocialSecurityNumber);
+
+        verify(database).save(eq(id),entityCaptor.capture());
+        verifyNoMoreInteractions(database);
 
         assertThat(actual.get()).isEqualTo(drivingLicence);
     }
